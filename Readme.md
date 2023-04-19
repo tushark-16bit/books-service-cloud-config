@@ -3,6 +3,25 @@
 
 this project implements backend of a book ecommerce platform as microservices
 
+## Tech Stack
+
+**Server:**
+- Spring Boot
+  - Web
+  - Actuator
+- Spring Cloud
+  - Eureka Service Registry
+  - Resilience4j
+  - Tracing(Zipkin/Micrometer)
+  - Api Gateway
+- Spring Security
+  - OAuth2 (Client / Resource Server)
+  - Okta
+- Spring Data
+  - JPA
+- Messaging
+  - Kafka
+
 
 ## Documentation
 
@@ -29,26 +48,6 @@ where in represents the input/ entrypoint into the service/ or driving port and 
 Infrastructure layer represents the implementation of application layer ports, where a web controller as driving port implementation or a database adapter as driven port implementation may be used.
 
 The Incoming Request into application are seggregated as command and queries using CQRS principles, where the command(update) responsibilty is separated from Query(read) responsibilty.
-
-## Tech Stack
-
-**Server:**
-- Spring Boot
-    - Web
-    - Actuator
-- Spring Cloud
-    - Eureka Service Registry
-    - Resilience4j
-    - Tracing(Zipkin/Micrometer)
-    - Api Gateway
-- Spring Security
-    - OAuth2 (Client / Resource Server)
-    - Okta
-- Spring Data
-    - JPA
-- Messaging
-    - Kafka
-
 
 ## Deployment
 
