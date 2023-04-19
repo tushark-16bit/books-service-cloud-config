@@ -66,7 +66,7 @@ services:
       - service-registry
 
   book-service:
-    image: ghcr.io/tushark-16bit/book-service:1.0.0
+    image: ghcr.io/tushark-16bit/book-service:1.0.1
     container_name: book-service
     environment:
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
@@ -84,7 +84,7 @@ services:
       - api-gateway
 
   cart-service:
-    image: ghcr.io/tushark-16bit/cart-service:1.0.0
+    image: ghcr.io/tushark-16bit/cart-service:1.0.1
     container_name: cart-service
     environment:
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
