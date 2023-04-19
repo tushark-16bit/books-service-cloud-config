@@ -1,0 +1,129 @@
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    container_name: zookeeper
+    networks:
+      - books-network
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  broker:
+    image: confluentinc/cp-kafka:7.3.2
+    container_name: broker
+    ports:
+      # To learn about configuring Kafka for access across networks see
+      # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+      - books-network
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  zipkin-server:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin-server
+    ports:
+      - "9411:9411"
+    networks:
+      - books-network
+    restart: always
+
+  service-registry:
+    image: ghcr.io/tushark-16bit/service-registry:1.0.0
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - books-network
+    depends_on:
+      - zipkin-server
+
+  api-gateway:
+    image: ghcr.io/tushark-16bit/books-api-gateway:1.0.0
+    container_name: api-gateway
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+      EUREKA.CLIENT.FETCHREGISTRY: "true"
+      EUREKA.INSTANCE.PREFERIPADDRESS: "true"
+      EUREKA.INSTANCE.HOSTNAME: service-registry
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+    ports:
+      - "8080:8080"
+    networks:
+      - books-network
+    depends_on:
+      - zipkin-server
+      - service-registry
+
+  book-service:
+    image: ghcr.io/tushark-16bit/book-service:1.0.0
+    container_name: book-service
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+      EUREKA.CLIENT.FETCHREGISTRY: "true"
+      EUREKA.INSTANCE.PREFERIPADDRESS: "true"
+      EUREKA.INSTANCE.HOSTNAME: service-registry
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+    ports:
+      - "8000:8000"
+    networks:
+      - books-network
+    depends_on:
+      - zipkin-server
+      - service-registry
+      - api-gateway
+
+  cart-service:
+    image: ghcr.io/tushark-16bit/cart-service:1.0.0
+    container_name: cart-service
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+      EUREKA.CLIENT.FETCHREGISTRY: "true"
+      EUREKA.INSTANCE.PREFERIPADDRESS: "true"
+      EUREKA.INSTANCE.HOSTNAME: service-registry
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+      SPRING.KAFKA.BOOTSTRAP-SERVERS: broker:29092
+    ports:
+      - "8100:8100"
+    networks:
+      - books-network
+    depends_on:
+      - zipkin-server
+      - service-registry
+      - api-gateway
+      - book-service
+      - broker
+
+  purchase-service:
+    image: ghcr.io/tushark-16bit/book-purchase-service:1.0.0
+    container_name: purchase-service
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://service-registry:8761/eureka
+      EUREKA.CLIENT.FETCHREGISTRY: "true"
+      EUREKA.INSTANCE.PREFERIPADDRESS: "true"
+      EUREKA.INSTANCE.HOSTNAME: service-registry
+      SPRING.KAFKA.BOOTSTRAP-SERVERS: broker:29092
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+    networks:
+      - books-network
+    ports:
+      - "8200:8200"
+    depends_on:
+      - zipkin-server
+      - service-registry
+      - api-gateway
+      - cart-service
+      - broker
+
+networks:
+  books-network:
