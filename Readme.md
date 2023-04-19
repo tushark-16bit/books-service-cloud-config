@@ -6,6 +6,13 @@ this project implements backend of a book ecommerce platform as microservices
 
 ## Documentation
 
+There are three microservices implemented around domain:
+- [Book-Service](https://github.com/tushark-16bit/books-microservice)
+- [Cart-Service](https://github.com/tushark-16bit/cart-service)
+- [Book-Purchase-Order-Service](https://github.com/tushark-16bit/book-purchase-service)
+
+and [Api-Gateway](https://github.com/tushark-16bit/books-api-gateway) is used as security endpoint and loadbalancer for services
+
 These microservices were developed using **Hexagonal Architecture**(Ports and Adapters) using **DDD** principles. The microservice created around a domain implements business rules which are independent of techinal implementations.
 
 The project structure implemented as:
@@ -22,14 +29,6 @@ where in represents the input/ entrypoint into the service/ or driving port and 
 Infrastructure layer represents the implementation of application layer ports, where a web controller as driving port implementation or a database adapter as driven port implementation may be used.
 
 The Incoming Request into application are seggregated as command and queries using CQRS principles, where the command(update) responsibilty is separated from Query(read) responsibilty.
-
-There are three microservices implemented around domain:
-- [Book-Service](https://github.com/tushark-16bit/books-microservice)
-- [Cart-Service](https://github.com/tushark-16bit/cart-service)
-- [Book-Purchase-Order-Service](https://github.com/tushark-16bit/book-purchase-service)
-
-and [Api-Gateway](https://github.com/tushark-16bit/books-api-gateway) is used as security endpoint and loadbalancer for services
-
 
 ## Tech Stack
 
