@@ -20,6 +20,7 @@ this project implements backend of a book ecommerce platform as microservices
   - Okta
 - Spring Data
   - JPA
+  - Hibernate
 - Messaging
   - Kafka
 
