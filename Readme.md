@@ -89,6 +89,8 @@ TOKEN AS RETRIEVED ABOVE.**
 **Tracing of requests** through the microservices exposed at
 ```http://localhost:9411/zipkin```
 
+**Eureka Service Registry server** exposed at ```http://localhost:8761/```
+
 
 ## Routing
 
